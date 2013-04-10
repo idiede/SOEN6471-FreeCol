@@ -123,7 +123,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /** Players with respect to which stance has changed. */
     private List<ServerPlayer> stanceDirty = new ArrayList<ServerPlayer>();
 
-
+    protected ServerPlayerCombat spCombat;
     /**
      * Trivial constructor required for all ServerModelObjects.
      */
@@ -1892,14 +1892,20 @@ public class ServerPlayer extends Player implements ServerModelObject {
                          List<CombatResult> crs,
                          Random random,
                          ChangeSet cs) throws IllegalStateException {
-    	//make an instance of ServerPlayerCombat
-    ServerPlayerCombat spCombat = new ServerPlayerCombat(this.getGame(), this.getId()); 
-       	//      spCombat. 
     	
+    	/* 
+    	 *  Instance of ServerPlayerCombat delegate method 
+    	 *  The constructor of SeverPlayerCombat calls method csCombat in ServerPLayerCombat Class 
+    	 *  
+    	 */
+    	
+    	
+          spCombat = new ServerPlayerCombat(this.getGame(), this.getId()); 
+     
     	////////////////////////////////// old method ////////////////////////////////////////////////
     	
     	
-        CombatModel combatModel = getGame().getCombatModel();
+   /*     CombatModel combatModel = getGame().getCombatModel();
         boolean isAttack = combatModel.combatIsAttack(attacker, defender);
         boolean isBombard = combatModel.combatIsBombard(attacker, defender);
         Unit attackerUnit = null;
@@ -2368,7 +2374,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (attackerTileDirty) cs.add(vis, attackerTile);
         if (defenderTileDirty) cs.add(vis, defenderTile);
 //////////////////////////////////////////////////////////////end of old method///////////////////////////////////////////
-    }//end class
+    
 
     /**
      * Gets the amount to raise tension by when a unit is slaughtered.
@@ -2376,6 +2382,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param loser The <code>Unit</code> that dies.
      * @return An amount to raise tension by.
      */
+          
+}//end class
+    
+    
     protected int getSlaughterTension(Unit loser) {
         // Tension rises faster when units die.
         Settlement settlement = loser.getSettlement();

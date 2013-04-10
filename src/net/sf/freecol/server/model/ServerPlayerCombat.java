@@ -48,11 +48,11 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
     	super(game, id);
     	
        //should implicitly call spComabt in the constructor
-        spCombat( attacker, defender, crs, random, cs);
+        csCombat( attacker, defender, crs, random, cs);
     	
     }
     
-    public void spCombat(FreeColGameObject attacker,
+    public void csCombat(FreeColGameObject attacker,
                          FreeColGameObject defender,
                          List<CombatResult> crs,
                          Random random,
