@@ -1892,6 +1892,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                          List<CombatResult> crs,
                          Random random,
                          ChangeSet cs) throws IllegalStateException {
+    	//make an instance of ServerPlayerCombat
+    ServerPlayerCombat spCombat = new ServerPlayerCombat(this.getGame(), this.getId()); 
+       	//      spCombat. 
+    	
+    	////////////////////////////////// old method ////////////////////////////////////////////////
+    	
+    	
         CombatModel combatModel = getGame().getCombatModel();
         boolean isAttack = combatModel.combatIsAttack(attacker, defender);
         boolean isBombard = combatModel.combatIsBombard(attacker, defender);
@@ -2360,7 +2367,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // if it is not already done yet.
         if (attackerTileDirty) cs.add(vis, attackerTile);
         if (defenderTileDirty) cs.add(vis, defenderTile);
-    }
+//////////////////////////////////////////////////////////////end of old method///////////////////////////////////////////
+    }//end class
 
     /**
      * Gets the amount to raise tension by when a unit is slaughtered.

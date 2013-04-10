@@ -2,14 +2,17 @@ package net.sf.freecol.server.model;
 
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
@@ -20,7 +23,9 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 
-public class ServerPlayerCombat {
+public class ServerPlayerCombat extends ServerPlayer implements ServerModelObject{
+	
+	
 	  /**
      * Combat.
      *
@@ -30,11 +35,30 @@ public class ServerPlayerCombat {
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csCombat(FreeColGameObject attacker,
+	
+	private static final Logger logger = Logger.getLogger(ServerPlayer.class.getName());
+	
+	FreeColGameObject attacker;
+    FreeColGameObject defender;
+    List<CombatResult> crs;
+    Random random;
+    ChangeSet cs;
+    
+    public ServerPlayerCombat(Game game, String id){
+    	super(game, id);
+    	
+       //should implicitly call spComabt in the constructor
+        spCombat( attacker, defender, crs, random, cs);
+    	
+    }
+    
+    public void spCombat(FreeColGameObject attacker,
                          FreeColGameObject defender,
                          List<CombatResult> crs,
                          Random random,
                          ChangeSet cs) throws IllegalStateException {
+    	
+    	
         CombatModel combatModel = getGame().getCombatModel();
         boolean isAttack = combatModel.combatIsAttack(attacker, defender);
         boolean isBombard = combatModel.combatIsBombard(attacker, defender);
@@ -503,5 +527,17 @@ public class ServerPlayerCombat {
         // if it is not already done yet.
         if (attackerTileDirty) cs.add(vis, attackerTile);
         if (defenderTileDirty) cs.add(vis, defenderTile);
-    }
+    }//end method
+    
+    //added to override inherited methods
+	@Override
+	public String getServerXMLElementTagName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void csNewTurn(Random random, ChangeSet cs) {
+		// TODO Auto-generated method stub
+		
+	}
 }
