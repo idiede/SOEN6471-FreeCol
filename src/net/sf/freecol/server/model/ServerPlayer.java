@@ -2376,7 +2376,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param loser The <code>Unit</code> that dies.
      * @return An amount to raise tension by.
      */
-    private int getSlaughterTension(Unit loser) {
+    protected int getSlaughterTension(Unit loser) {
         // Tension rises faster when units die.
         Settlement settlement = loser.getSettlement();
         if (settlement != null) {
@@ -2401,7 +2401,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param settlement The <code>Settlement</code> being defended.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csAutoequipUnit(Unit unit, Settlement settlement,
+    protected void csAutoequipUnit(Unit unit, Settlement settlement,
                                  ChangeSet cs) {
         ServerPlayer player = (ServerPlayer) unit.getOwner();
         cs.addMessage(See.only(player),
@@ -2418,7 +2418,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param settlement The <code>IndianSettlement</code> that was attacked.
      * @param cs The <code>ChangeSet</code> to update.
      */
-    private void csBurnMissions(Unit attacker, IndianSettlement settlement,
+    protected void csBurnMissions(Unit attacker, IndianSettlement settlement,
                                 ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attackerPlayer.getNationName();
@@ -2447,7 +2447,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param defender The <code>Unit</code> that defended and loses equipment.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csCaptureAutoEquip(Unit attacker, Unit defender,
+    protected void csCaptureAutoEquip(Unit attacker, Unit defender,
                                     ChangeSet cs) {
         EquipmentType equip
             = defender.getBestCombatEquipmentType(defender.getAutomaticEquipment());
@@ -2463,7 +2463,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param random A pseudo-random number source.
      * @param cs The <code>ChangeSet</code> to update.
      */
-    private void csCaptureColony(Unit attacker, Colony colony, Random random,
+    protected void csCaptureColony(Unit attacker, Colony colony, Random random,
                                  ChangeSet cs) {
         Game game = attacker.getGame();
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
@@ -2548,7 +2548,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csCaptureConvert(Unit attacker, IndianSettlement natives,
+    protected void csCaptureConvert(Unit attacker, IndianSettlement natives,
                                   Random random, ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate convertNation = natives.getOwner().getNationName();
@@ -2579,7 +2579,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param loser The <code>Unit</code> that defended and loses equipment.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csCaptureEquip(Unit winner, Unit loser, ChangeSet cs) {
+    protected void csCaptureEquip(Unit winner, Unit loser, ChangeSet cs) {
         EquipmentType equip
             = loser.getBestCombatEquipmentType(loser.getEquipment());
         csLoseEquip(winner, loser, cs);
@@ -2641,7 +2641,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param loser A <code>Unit</code> to capture.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csCaptureUnit(Unit winner, Unit loser, ChangeSet cs) {
+    protected void csCaptureUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loserPlayer.getNationName();
         StringTemplate loserLocation = loser.getLocation()
@@ -2690,7 +2690,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param colony The <code>Colony</code> to damage ships in.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csDamageColonyShips(Unit attacker, Colony colony,
+    protected void csDamageColonyShips(Unit attacker, Colony colony,
                                      ChangeSet cs) {
         List<Unit> units = colony.getTile().getUnitList();
         while (!units.isEmpty()) {
@@ -2706,7 +2706,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param ship The <code>Unit</code> which is a ship to damage.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csDamageShipAttack(Unit attacker, Unit ship, ChangeSet cs) {
+    protected void csDamageShipAttack(Unit attacker, Unit ship, ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attacker.getApparentOwnerName();
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
@@ -2738,7 +2738,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param ship The <code>Unit</code> which is a ship to damage.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csDamageShipBombard(Settlement settlement, Unit ship,
+    protected void csDamageShipBombard(Settlement settlement, Unit ship,
                                      ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) settlement.getOwner();
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
@@ -2798,7 +2798,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param loser The <code>Unit</code> that lost and should be demoted.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csDemoteUnit(Unit winner, Unit loser, ChangeSet cs) {
+    protected void csDemoteUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loser.getApparentOwnerName();
         StringTemplate loserLocation = loser.getLocation()
@@ -2848,7 +2848,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param random A pseudo-random number source.
      * @param cs The <code>ChangeSet</code> to update.
      */
-    private void csDestroyColony(Unit attacker, Colony colony, Random random,
+    protected void csDestroyColony(Unit attacker, Colony colony, Random random,
                                  ChangeSet cs) {
         Game game = attacker.getGame();
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
@@ -2897,7 +2897,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csDestroySettlement(Unit attacker,
+    protected void csDestroySettlement(Unit attacker,
                                      IndianSettlement settlement,
                                      Random random, ChangeSet cs) {
         Game game = getGame();
@@ -3075,7 +3075,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param defender A naval <code>Unit</code> that evades the attacker.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csEvadeAttack(Unit attacker, Unit defender, ChangeSet cs) {
+    protected void csEvadeAttack(Unit attacker, Unit defender, ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attacker.getApparentOwnerName();
         ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
@@ -3102,7 +3102,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param defender A naval <code>Unit</code> that evades the attacker.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csEvadeBombard(Settlement settlement, Unit defender,
+    protected void csEvadeBombard(Settlement settlement, Unit defender,
                                 ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) settlement.getOwner();
         ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
@@ -3129,7 +3129,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param loser The losing naval <code>Unit</code>
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
+    protected void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         if (loser.getGoodsList().size() > 0 && winner.hasSpaceLeft()) {
             List<Goods> capture = new ArrayList<Goods>(loser.getGoodsList());
@@ -3150,7 +3150,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param defender The <code>Unit</code> that defended and loses equipment.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csLoseAutoEquip(Unit attacker, Unit defender, ChangeSet cs) {
+    protected void csLoseAutoEquip(Unit attacker, Unit defender, ChangeSet cs) {
         ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
         StringTemplate defenderNation = defenderPlayer.getNationName();
         Settlement settlement = defender.getSettlement();
@@ -3196,7 +3196,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param loser The <code>Unit</code> that lost and loses equipment.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csLoseEquip(Unit winner, Unit loser, ChangeSet cs) {
+    protected void csLoseEquip(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loserPlayer.getNationName();
         StringTemplate loserLocation = loser.getLocation()
@@ -3253,7 +3253,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csPillageColony(Unit attacker, Colony colony,
+    protected void csPillageColony(Unit attacker, Colony colony,
                                  Random random, ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attacker.getApparentOwnerName();
@@ -3361,7 +3361,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param loser The <code>Unit</code> that lost.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csPromoteUnit(Unit winner, Unit loser, ChangeSet cs) {
+    protected void csPromoteUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winnerPlayer.getNationName();
         StringTemplate oldName = winner.getLabel();
@@ -3389,7 +3389,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param colony The <code>Colony</code> to sink ships in.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csSinkColonyShips(Unit attacker, Colony colony, ChangeSet cs) {
+    protected void csSinkColonyShips(Unit attacker, Colony colony, ChangeSet cs) {
         List<Unit> units = colony.getTile().getUnitList();
         while (!units.isEmpty()) {
             Unit unit = units.remove(0);
@@ -3406,7 +3406,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param ship The naval <code>Unit</code> to sink.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csSinkShipAttack(Unit attacker, Unit ship, ChangeSet cs) {
+    protected void csSinkShipAttack(Unit attacker, Unit ship, ChangeSet cs) {
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
         StringTemplate shipNation = ship.getApparentOwnerName();
         Unit attackerUnit = (Unit) attacker;
@@ -3436,7 +3436,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param ship The naval <code>Unit</code> to sink.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csSinkShipBombard(Settlement settlement, Unit ship,
+    protected void csSinkShipBombard(Settlement settlement, Unit ship,
                                    ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) settlement.getOwner();
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
@@ -3483,7 +3483,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param loser The <code>Unit</code> to slaughter.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csSlaughterUnit(Unit winner, Unit loser, ChangeSet cs) {
+    protected void csSlaughterUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winner.getApparentOwnerName();
         StringTemplate winnerLocation = winner.getLocation()
