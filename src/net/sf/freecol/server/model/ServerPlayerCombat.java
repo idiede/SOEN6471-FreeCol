@@ -61,9 +61,6 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
     public ServerPlayerCombat(Game game){
     	super(game);
     	
-       //implicitly call spComabt in the constructor ?? Not right now
-       // csCombat( attacker, defender, crs, random, cs);
-    	
     }
     
     public void csCombat(FreeColGameObject attacker,
@@ -541,9 +538,16 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
         // if it is not already done yet.
         if (attackerTileDirty) cs.add(vis, attackerTile);
         if (defenderTileDirty) cs.add(vis, defenderTile);
-    }//end method
+    }//end long method
     
- 
+    /**
+     * getSlaughterTension
+     * Gets the amount to raise tension by when a unit is slaughtered.
+     *
+     * @param loser The <code>Unit</code> that dies.
+     * @return An amount to raise tension by.
+     */
+    
     private int getSlaughterTension(Unit loser) {
         // Tension rises faster when units die.
         Settlement settlement = loser.getSettlement();
@@ -1343,83 +1347,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
         // Dispose of the colony and its contents.
         csDisposeSettlement(colony, cs);
     }
-    /**
-     * Destroys an Indian settlement.
-     *
-     * @param attacker an <code>Unit</code> value
-     * @param settlement an <code>IndianSettlement</code> value
-     * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
-     */
- /*                           UNABLE TO REFACTOR LEFT IN SERVERPLAYER CLASS
-  * 
-  * protected void csDestroySettlement(Unit attacker,
-                                     IndianSettlement settlement,
-                                     Random random, ChangeSet cs) {
-        Game game = getGame();
-        Tile tile = settlement.getTile();
-        ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
-        ServerPlayer nativePlayer = (ServerPlayer) settlement.getOwner();
-        StringTemplate attackerNation = attackerPlayer.getNationName();
-        StringTemplate nativeNation = nativePlayer.getNationName();
-        String settlementName = settlement.getName();
-        boolean capital = settlement.isCapital();
-        int plunder = settlement.getPlunder(attacker, random);
-
-        // Remaining units lose their home.
-        for (Unit u : settlement.getOwnedUnits()) {
-            u.setIndianSettlement(null);
-            cs.add(See.only(nativePlayer), u);
-        }
-                
-        // Destroy the settlement, update settlement tiles.
-        csDisposeSettlement(settlement, cs);
-
-        // Make the treasure train if there is treasure.
-        if (plunder > 0) {
-            List<UnitType> unitTypes = game.getSpecification()
-                .getUnitTypesWithAbility(Ability.CARRY_TREASURE);
-            UnitType type = Utils.getRandomMember(logger, "Choose train",
-                unitTypes, random);
-            Unit train = new ServerUnit(game, tile, attackerPlayer, type);
-            train.setTreasureAmount(plunder);
-        }
-
-        // This is an atrocity.
-        int atrocities = Player.SCORE_SETTLEMENT_DESTROYED;
-        if (settlement.getType().getClaimableRadius() > 1) atrocities *= 2;
-        if (capital) atrocities = (atrocities * 3) / 2;
-        attackerPlayer.modifyScore(atrocities);
-        cs.addPartial(See.only(attackerPlayer), attackerPlayer, "score");
-
-        // Finish with messages and history.
-        cs.addMessage(See.only(attackerPlayer),
-            new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                             "model.unit.indianTreasure", attacker)
-                .addName("%settlement%", settlementName)
-                .addAmount("%amount%", plunder));
-        cs.addHistory(attackerPlayer,
-            new HistoryEvent(game.getTurn(),
-                             HistoryEvent.EventType.DESTROY_SETTLEMENT)
-                .addStringTemplate("%nation%", nativeNation)
-                .addName("%settlement%", settlementName));
-        if (capital) {
-            cs.addMessage(See.only(attackerPlayer),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                 "indianSettlement.capitalBurned", attacker)
-                    .addName("%name%", settlementName)
-                    .addStringTemplate("%nation%", nativeNation));
-        }
-        if (nativePlayer.checkForDeath() == IS_DEAD) {
-            cs.addGlobalHistory(game,
-                new HistoryEvent(game.getTurn(),
-                                 HistoryEvent.EventType.DESTROY_NATION)
-                    .addStringTemplate("%nation%", attackerNation)
-                    .addStringTemplate("%nativeNation%", nativeNation));
-        }
-        cs.addAttribute(See.only(attackerPlayer), "sound",
-            "sound.event.destroySettlement");
-    }*/
+ 
     /**
      * Evade a normal attack.
      *
@@ -1495,7 +1423,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
         loser.setState(Unit.UnitState.ACTIVE);
     }
     /**
-     * Unit autoequips but loses equipment.
+     * Unit auto equips but loses equipment.
      *
      * @param attacker The <code>Unit</code> that attacked.
      * @param defender The <code>Unit</code> that defended and loses equipment.
@@ -1700,16 +1628,19 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
     }
 
     //////////////////////////////////////////end imported methods//////////////////////////////////////
-  
+    @Override
+    public String toString() {
+        return "ServerPlayerCombat[name=" + getName() + ",ID=" + getId() + "]";
+    }
     //added to override inherited methods
 	@Override
 	public String getServerXMLElementTagName() {
-		// TODO Auto-generated method stub
-		return null;
+		 return "serverPlayerCombat";
+
 	}
-	@Override
-	public void csNewTurn(Random random, ChangeSet cs) {
-		// TODO Auto-generated method stub
+//	@Override
+//	public void csNewTurn(Random random, ChangeSet cs) {
+//		// TODO Auto-generated method stub
 		
-	}
+//	}
 }
