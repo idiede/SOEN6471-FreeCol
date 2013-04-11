@@ -1230,7 +1230,9 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      */
- /*   protected void csDestroySettlement(Unit attacker,
+ /*                           UNABLE TO REFACTOR LEFT IN SERVERPLAYER CLASS
+  * 
+  * protected void csDestroySettlement(Unit attacker,
                                      IndianSettlement settlement,
                                      Random random, ChangeSet cs) {
         Game game = getGame();
