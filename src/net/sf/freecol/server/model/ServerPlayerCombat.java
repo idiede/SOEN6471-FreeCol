@@ -58,8 +58,8 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
     Random random;
     ChangeSet cs;
     
-    public ServerPlayerCombat(Game game, String id){
-    	super(game, id);
+    public ServerPlayerCombat(Game game){
+    	super(game);
     	
        //implicitly call spComabt in the constructor ?? Not right now
        // csCombat( attacker, defender, crs, random, cs);

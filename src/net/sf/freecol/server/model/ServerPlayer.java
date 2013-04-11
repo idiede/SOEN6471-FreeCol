@@ -130,6 +130,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public ServerPlayer(Game game, String id) {
         super(game, id);
     }
+    public ServerPlayer(Game game) {
+        super(game);
+    }
 
     /**
      * Creates a new ServerPlayer.
@@ -1900,7 +1903,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     	 */
     	
     	
-          spCombat = new ServerPlayerCombat(this.getGame(), this.getId()); //instance of ServerPlayerCombat
+          spCombat = new ServerPlayerCombat(this.getGame()); //instance of ServerPlayerCombat
           spCombat.csCombat(attacker, defender, crs, random, cs); //delegate method csCombat to ServerPlayerCombat
     	////////////////////////////////// old method ////////////////////////////////////////////////
     	
