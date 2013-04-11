@@ -1900,8 +1900,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     	 */
     	
     	
-          spCombat = new ServerPlayerCombat(this.getGame(), this.getId()); 
-     
+          spCombat = new ServerPlayerCombat(this.getGame(), this.getId()); //instance of ServerPlayerCombat
+          spCombat.csCombat(attacker, defender, crs, random, cs); //delegate method csCombat to ServerPlayerCombat
     	////////////////////////////////// old method ////////////////////////////////////////////////
     	
     	
@@ -2385,8 +2385,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
           
 }//end class
     
+////////////////////////////////////////Protected Classes Called from ServerPlayerCombat//////////////////////////////////
     
-    protected int getSlaughterTension(Unit loser) {
+    
+  /*  protected int getSlaughterTension(Unit loser) {
         // Tension rises faster when units die.
         Settlement settlement = loser.getSettlement();
         if (settlement != null) {
@@ -2402,7 +2404,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 ? Tension.TENSION_ADD_UNIT_DESTROYED
                 : Tension.TENSION_ADD_MINOR;
         }
-    }
+    }*/
 
     /**
      * Notifies of automatic arming.
@@ -3543,7 +3545,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         cs.addDispose(See.perhaps().always(loserPlayer),
             loser.getLocation(), loser);
     }
-
+////////////////////////////////////////Protected Classes Called from ServerPlayerCombat//////////////////////////////////
     /**
      * Updates the PlayerExploredTile for each new tile on a supplied list,
      * and update a changeset as well.

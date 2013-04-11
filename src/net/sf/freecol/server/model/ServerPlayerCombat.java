@@ -47,8 +47,8 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
     public ServerPlayerCombat(Game game, String id){
     	super(game, id);
     	
-       //should implicitly call spComabt in the constructor
-        csCombat( attacker, defender, crs, random, cs);
+       //implicitly call spComabt in the constructor ?? Not right now
+       // csCombat( attacker, defender, crs, random, cs);
     	
     }
     
@@ -528,6 +528,28 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
         if (attackerTileDirty) cs.add(vis, attackerTile);
         if (defenderTileDirty) cs.add(vis, defenderTile);
     }//end method
+    
+ 
+    private int getSlaughterTension(Unit loser) {
+        // Tension rises faster when units die.
+        Settlement settlement = loser.getSettlement();
+        if (settlement != null) {
+            if (settlement instanceof IndianSettlement) {
+                return (((IndianSettlement) settlement).isCapital())
+                    ? Tension.TENSION_ADD_CAPITAL_ATTACKED
+                    : Tension.TENSION_ADD_SETTLEMENT_ATTACKED;
+            } else {
+                return Tension.TENSION_ADD_NORMAL;
+            }
+        } else { // attack in the open
+            return (loser.getIndianSettlement() != null)
+                ? Tension.TENSION_ADD_UNIT_DESTROYED
+                : Tension.TENSION_ADD_MINOR;
+        }
+    }
+
+    
+    
     
     //added to override inherited methods
 	@Override
