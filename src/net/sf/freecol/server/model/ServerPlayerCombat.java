@@ -761,7 +761,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
      * @param equip The <code>EquipmentType</code> to capture.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    protected void csCaptureEquipment(Unit winner, Unit loser,
+    private void csCaptureEquipment(Unit winner, Unit loser,
     		EquipmentType equip, ChangeSet cs) {
     	ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
     	ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
@@ -800,7 +800,128 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
     		}
     	}
 }
-    
+    /**
+     * Promotes a unit.
+     *
+     * @param winner The <code>Unit</code> that won and should be promoted.
+     * @param loser The <code>Unit</code> that lost.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csPromoteUnit(Unit winner, Unit loser, ChangeSet cs) {
+        ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
+        StringTemplate winnerNation = winnerPlayer.getNationName();
+        StringTemplate oldName = winner.getLabel();
+
+        UnitType type = winner.getTypeChange(ChangeType.PROMOTION,
+                                             winnerPlayer);
+        if (type == null || type == winner.getType()) {
+            logger.warning("Promotion failed, type="
+                + ((type == null) ? "null" : "same type: " + type));
+            return;
+        }
+        winner.setType(type);
+        cs.addMessage(See.only(winnerPlayer),
+                      new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                          "model.unit.unitPromoted", winner)
+            .addStringTemplate("%oldName%", oldName)
+            .addStringTemplate("%unit%", winner.getLabel())
+            .addStringTemplate("%nation%", winnerNation));
+    }
+
+    /**
+     * Sinks all ships in a colony.
+     *
+     * @param attacker The attacker <code>Unit</code>.
+     * @param colony The <code>Colony</code> to sink ships in.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csSinkColonyShips(Unit attacker, Colony colony, ChangeSet cs) {
+        List<Unit> units = colony.getTile().getUnitList();
+        while (!units.isEmpty()) {
+            Unit unit = units.remove(0);
+            if (unit.isNaval()) {
+                csSinkShipAttack(attacker, unit, cs);
+            }
+        }
+    }
+
+    /**
+     * Sinks this ship as result of a normal attack.
+     *
+     * @param attacker The attacker <code>Unit</code>.
+     * @param ship The naval <code>Unit</code> to sink.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csSinkShipAttack(Unit attacker, Unit ship, ChangeSet cs) {
+        ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
+        StringTemplate shipNation = ship.getApparentOwnerName();
+        Unit attackerUnit = (Unit) attacker;
+        ServerPlayer attackerPlayer = (ServerPlayer) attackerUnit.getOwner();
+        StringTemplate attackerNation = attackerUnit.getApparentOwnerName();
+
+        cs.addMessage(See.only(attackerPlayer),
+            new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                "model.unit.enemyShipSunk", attackerUnit)
+            .addStringTemplate("%unit%", attackerUnit.getLabel())
+            .addStringTemplate("%enemyUnit%", ship.getLabel())
+            .addStringTemplate("%enemyNation%", shipNation));
+        cs.addMessage(See.only(shipPlayer),
+            new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                "model.unit.shipSunk", ship.getTile())
+            .addStringTemplate("%unit%", ship.getLabel())
+            .addStringTemplate("%enemyUnit%", attackerUnit.getLabel())
+            .addStringTemplate("%enemyNation%", attackerNation));
+
+        csSinkShip(ship, attackerPlayer, cs);
+    }
+
+    /**
+     * Sinks this ship as result of a bombard.
+     *
+     * @param settlement The bombarding <code>Settlement</code>.
+     * @param ship The naval <code>Unit</code> to sink.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csSinkShipBombard(Settlement settlement, Unit ship,
+                                   ChangeSet cs) {
+        ServerPlayer attackerPlayer = (ServerPlayer) settlement.getOwner();
+        ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
+        StringTemplate shipNation = ship.getApparentOwnerName();
+
+        cs.addMessage(See.only(attackerPlayer),
+            new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                "model.unit.shipSunkByBombardment", settlement)
+            .addName("%colony%", settlement.getName())
+            .addStringTemplate("%unit%", ship.getLabel())
+            .addStringTemplate("%nation%", shipNation));
+        cs.addMessage(See.only(shipPlayer),
+            new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                "model.unit.shipSunkByBombardment", ship.getTile())
+            .addName("%colony%", settlement.getName())
+            .addStringTemplate("%unit%", ship.getLabel()));
+
+        csSinkShip(ship, attackerPlayer, cs);
+    }
+
+    /**
+     * Sink the ship.
+     *
+     * @param ship The naval <code>Unit</code> to sink.
+     * @param attackerPlayer The <code>ServerPlayer</code> that
+     * attacked, or null
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    protected void csSinkShip(Unit ship, ServerPlayer attackerPlayer,
+                            ChangeSet cs) {
+        ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
+        cs.addDispose(See.perhaps().always(shipPlayer),
+            ship.getLocation(), ship);
+        if (attackerPlayer != null) {
+            cs.addAttribute(See.only(attackerPlayer), "sound",
+                            "sound.event.shipSunk");
+        }
+    }
+
     /**
      * Slaughter a unit.
      *
