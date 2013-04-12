@@ -140,7 +140,7 @@ public class SerializationTest extends FreeColTestCase {
 
     public void testSpecification() throws Exception {
         try {
-            String filename = "test/data/specification.xml";
+            String filename = "test/specification.xml";
             Validator validator = buildValidator("schema/specification-schema.xsd");
             FileWriter sw = new FileWriter(filename);
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
