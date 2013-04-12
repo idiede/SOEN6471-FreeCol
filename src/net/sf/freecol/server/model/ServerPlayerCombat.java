@@ -62,7 +62,12 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
     int attackerTension;
     int defenderTension;
     CombatResult result;
+    boolean attackerTileDirty;
+    boolean defenderTileDirty;
+    boolean moveAttacker;
     boolean burnedNativeCapital;
+    boolean isAttack;
+    boolean isBombard;
     
     public ServerPlayerCombat(Game game){
     	super(game);
@@ -80,10 +85,10 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
         this.crs = crs;
         this.random = random;
         this.cs = cs;
-    	
+    	//Local variables changed to Private Global
         CombatModel combatModel = getGame().getCombatModel();
-        boolean isAttack = combatModel.combatIsAttack(attacker, defender);
-        boolean isBombard = combatModel.combatIsBombard(attacker, defender);
+        isAttack = combatModel.combatIsAttack(attacker, defender);
+        isBombard = combatModel.combatIsBombard(attacker, defender);
         Unit attackerUnit = null;
         Settlement attackerSettlement = null;
         Tile attackerTile = null;
@@ -179,9 +184,9 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
                                             + result);
         }
         // Now process the details.
-        boolean attackerTileDirty = false;
-        boolean defenderTileDirty = false;
-        boolean moveAttacker = false;
+        attackerTileDirty = false;
+        defenderTileDirty = false;
+        moveAttacker = false;
         burnedNativeCapital = false;
         Settlement settlement = defenderTile.getSettlement();
         Colony colony = defenderTile.getColony();
@@ -455,107 +460,22 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
 
         // Handle stance and tension.
         // - Privateers do not provoke stance changes but can set the
-        //     attackedByPrivateers flag
+        // - attackedByPrivateers flag
         // - Attacks among Europeans imply war
         // - Burning of a native capital results in surrender
         // - Other attacks involving natives do not imply war, but
         //     changes in Tension can drive Stance, however this is
         //     decided by the native AI in their turn so just adjust tension.
         
-        // move this into its own method
+        // moved into method
        
         handleStanceAndTension(attacker, defenderPlayer); //refactored extract method
  
-       
-       /*      if (attacker.hasAbility(Ability.PIRACY)) {
-            if (!defenderPlayer.getAttackedByPrivateers()) {
-                defenderPlayer.setAttackedByPrivateers(true);
-                cs.addPartial(See.only(defenderPlayer), defenderPlayer,
-                              "attackedByPrivateers");
-            }
-        } else if (defender.hasAbility(Ability.PIRACY)) {
-            ; // do nothing
-        } else if (burnedNativeCapital) {
-            defenderPlayer.getTension(this).setValue(Tension.SURRENDERED);
-            cs.add(See.perhaps().always(this), defenderPlayer); // TODO: just the tension
-            csChangeStance(Stance.PEACE, defenderPlayer, true, cs);
-            for (IndianSettlement is : defenderPlayer.getIndianSettlements()) {
-                if (is.hasContacted(this)) {
-                    is.getAlarm(this).setValue(Tension.SURRENDERED);
-                    // Only update attacker with settlements that have
-                    // been seen, as contact can occur with its members.
-                    if (is.getTile().isExploredBy(this)) {
-                        cs.add(See.perhaps().always(this), is);
-                    } else {
-                        cs.add(See.only(defenderPlayer), is);
-                    }
-                }
-            }
-        } else if (isEuropean() && defenderPlayer.isEuropean()) {
-            csChangeStance(Stance.WAR, defenderPlayer, true, cs);
-        } else { // At least one player is non-European
-            if (isEuropean()) {
-                csChangeStance(Stance.WAR, defenderPlayer, true, cs);
-            } else if (isIndian()) {
-                if (result == CombatResult.WIN) {
-                    attackerTension -= Tension.TENSION_ADD_MINOR;
-                } else if (result == CombatResult.LOSE) {
-                    attackerTension += Tension.TENSION_ADD_MINOR;
-                }
-            }
-            if (defenderPlayer.isEuropean()) {
-                defenderPlayer.csChangeStance(Stance.WAR, this, true, cs);
-            } else if (defenderPlayer.isIndian()) {
-                if (result == CombatResult.WIN) {
-                    defenderTension += Tension.TENSION_ADD_MINOR;
-                } else if (result == CombatResult.LOSE) {
-                    defenderTension -= Tension.TENSION_ADD_MINOR;
-                }
-            }
-            if (attackerTension != 0) {
-                cs.add(See.only(null).perhaps(defenderPlayer),
-                       modifyTension(defenderPlayer, attackerTension));
-            }
-            if (defenderTension != 0) {
-                cs.add(See.only(null).perhaps(this),
-                       defenderPlayer.modifyTension(this, defenderTension));
-            }
-        }
-        */
-
+        // next method moveAttacker(..)    
         // Move the attacker if required.
-        if (moveAttacker) {
-            attackerUnit.setMovesLeft(attackerUnit.getInitialMovesLeft());
-            ((ServerUnit) attackerUnit).csMove(defenderTile, random, cs);
-            attackerUnit.setMovesLeft(0);
-            // Move adds in updates for the tiles, but...
-            attackerTileDirty = defenderTileDirty = false;
-            // ...with visibility of perhaps().
-            // Thus the defender might see the change,
-            // but because its settlement is gone it also might not.
-            // So add in another defender-specific update.
-            // The worst that can happen is a duplicate update.
-            cs.add(See.only(defenderPlayer), defenderTile);
-        } else if (isAttack) {
-            // The Revenger unit can attack multiple times, so spend
-            // at least the eventual cost of moving to the tile.
-            // Other units consume the entire move.
-            if (attacker.hasAbility("model.ability.multipleAttacks")) {
-                int movecost = attackerUnit.getMoveCost(defenderTile);
-                attackerUnit.setMovesLeft(attackerUnit.getMovesLeft()
-                                          - movecost);
-            } else {
-                attackerUnit.setMovesLeft(0);
-            }
-            if (!attackerTileDirty) {
-                cs.addPartial(See.only(this), attacker, "movesLeft");
-            }
-        }
-
-        // Make sure we always update the attacker and defender tile
-        // if it is not already done yet.
-        if (attackerTileDirty) cs.add(vis, attackerTile);
-        if (defenderTileDirty) cs.add(vis, defenderTile);
+        moveAttacker(attackerUnit, attacker, defenderPlayer, defenderTile, attackerTile, vis);
+        // Move the attacker if required.
+       
     }//end long method
     
     /**
@@ -1652,79 +1572,15 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
     /////////////////////////////////////////new methods//////////////////////////////////////////////
     
     /*
-     *added method    // Handle stance and tension. line 444
+        // - added method    // Handle stance and tension. from orginal line 444
         // - Privateers do not provoke stance changes but can set the
-        //     attackedByPrivateers flag
+        // - attackedByPrivateers flag
         // - Attacks among Europeans imply war
         // - Burning of a native capital results in surrender
         // - Other attacks involving natives do not imply war, but
         //     changes in Tension can drive Stance, however this is
         //     decided by the native AI in their turn so just adjust tension.
-        
-        //let's move this into its own method
-        //void handleStanceAndTension(attacker. defenderPlayer);
-     *  //let's move this into its own method
-        //void handleStanceAndTension(attacker. defenderPlayer);
-      
-        
-        
-        ///this code from 
-        if (attacker.hasAbility(Ability.PIRACY)) {
-            if (!defenderPlayer.getAttackedByPrivateers()) {
-                defenderPlayer.setAttackedByPrivateers(true);
-                cs.addPartial(See.only(defenderPlayer), defenderPlayer,
-                              "attackedByPrivateers");
-            }
-        } else if (defender.hasAbility(Ability.PIRACY)) {
-            ; // do nothing
-        } else if (burnedNativeCapital) {
-            defenderPlayer.getTension(this).setValue(Tension.SURRENDERED);
-            cs.add(See.perhaps().always(this), defenderPlayer); // TODO: just the tension
-            csChangeStance(Stance.PEACE, defenderPlayer, true, cs);
-            for (IndianSettlement is : defenderPlayer.getIndianSettlements()) {
-                if (is.hasContacted(this)) {
-                    is.getAlarm(this).setValue(Tension.SURRENDERED);
-                    // Only update attacker with settlements that have
-                    // been seen, as contact can occur with its members.
-                    if (is.getTile().isExploredBy(this)) {
-                        cs.add(See.perhaps().always(this), is);
-                    } else {
-                        cs.add(See.only(defenderPlayer), is);
-                    }
-                }
-            }
-        } else if (isEuropean() && defenderPlayer.isEuropean()) {
-            csChangeStance(Stance.WAR, defenderPlayer, true, cs);
-        } else { // At least one player is non-European
-            if (isEuropean()) {
-                csChangeStance(Stance.WAR, defenderPlayer, true, cs);
-            } else if (isIndian()) {
-                if (result == CombatResult.WIN) {
-                    attackerTension -= Tension.TENSION_ADD_MINOR;
-                } else if (result == CombatResult.LOSE) {
-                    attackerTension += Tension.TENSION_ADD_MINOR;
-                }
-            }
-            if (defenderPlayer.isEuropean()) {
-                defenderPlayer.csChangeStance(Stance.WAR, this, true, cs);
-            } else if (defenderPlayer.isIndian()) {
-                if (result == CombatResult.WIN) {
-                    defenderTension += Tension.TENSION_ADD_MINOR;
-                } else if (result == CombatResult.LOSE) {
-                    defenderTension -= Tension.TENSION_ADD_MINOR;
-                }
-            }
-            if (attackerTension != 0) {
-                cs.add(See.only(null).perhaps(defenderPlayer),
-                       modifyTension(defenderPlayer, attackerTension));
-            }
-            if (defenderTension != 0) {
-                cs.add(See.only(null).perhaps(this),
-                       defenderPlayer.modifyTension(this, defenderTension));
-            }
-        }
-
-     */
+        */
     
     void handleStanceAndTension(FreeColGameObject attacker, ServerPlayer defenderPlayer){
     	
@@ -1784,8 +1640,43 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
          }
     	
     }
-    
-    
+    void moveAttacker(Unit attackerUnit,FreeColGameObject attacker,
+    		           ServerPlayer defenderPlayer, Tile defenderTile, Tile attackerTile, See vis){
+    	  if (moveAttacker) {
+              attackerUnit.setMovesLeft(attackerUnit.getInitialMovesLeft());
+              ((ServerUnit) attackerUnit).csMove(defenderTile, random, cs);
+              attackerUnit.setMovesLeft(0);
+              // Move adds in updates for the tiles, but...
+              attackerTileDirty = defenderTileDirty = false;
+              // ...with visibility of perhaps().
+              // Thus the defender might see the change,
+              // but because its settlement is gone it also might not.
+              // So add in another defender-specific update.
+              // The worst that can happen is a duplicate update.
+              cs.add(See.only(defenderPlayer), defenderTile);
+          } else if (isAttack) {
+              // The Revenger unit can attack multiple times, so spend
+              // at least the eventual cost of moving to the tile.
+              // Other units consume the entire move.
+              if (attacker.hasAbility("model.ability.multipleAttacks")) {
+                  int movecost = attackerUnit.getMoveCost(defenderTile);
+                  attackerUnit.setMovesLeft(attackerUnit.getMovesLeft()
+                                            - movecost);
+              } else {
+                  attackerUnit.setMovesLeft(0);
+              }
+              if (!attackerTileDirty) {
+                  cs.addPartial(See.only(this), attacker, "movesLeft");
+              }
+          }
+
+          // Make sure we always update the attacker and defender tile
+          // if it is not already done yet.
+          if (attackerTileDirty) cs.add(vis, attackerTile);
+          if (defenderTileDirty) cs.add(vis, defenderTile);
+    	
+    }
+    ///////////////////////////////////////////override///////////////////////////////////////
     @Override
     public String toString() {
         return "ServerPlayerCombat[name=" + getName() + ",ID=" + getId() + "]";
@@ -1794,7 +1685,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
 	@Override
 	public String getServerXMLElementTagName() {
 		 return "serverPlayerCombat";
-
+  
 	}
 //	@Override
 //	public void csNewTurn(Random random, ChangeSet cs) {
