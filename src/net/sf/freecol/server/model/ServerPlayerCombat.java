@@ -68,7 +68,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
     boolean burnedNativeCapital;
     boolean isAttack;
     boolean isBombard;
-    
+    SlaughterUnit slaughterUnit;
     public ServerPlayerCombat(Game game ){
     	super(game);
     	
@@ -433,16 +433,19 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
                     defenderTileDirty = true;
                 }
                 break;
-            case SLAUGHTER_UNIT:
-                ok = isAttack && result != CombatResult.NO_RESULT;
+            case SLAUGHTER_UNIT://lets do some poly morphism
+                //slaughterUnit = new SlaughterUnit(attckerUnit, defenderUnit, cs); 
+            	slaughterUnit = new SlaughterUnit(getGame());
+            	ok = isAttack && result != CombatResult.NO_RESULT;
                 if (ok) {
                     if (result == CombatResult.WIN) {
-                        csSlaughterUnit(attackerUnit, defenderUnit, cs);
+                    	
+                        slaughterUnit.csSlaughterUnit(attackerUnit, defenderUnit, cs);
                         defenderTileDirty = true;
                         attackerTension -= Tension.TENSION_ADD_NORMAL;
                         defenderTension += getSlaughterTension(defenderUnit);
                     } else {
-                        csSlaughterUnit(defenderUnit, attackerUnit, cs);
+                        slaughterUnit.csSlaughterUnit(defenderUnit, attackerUnit, cs);
                         attackerTileDirty = true;
                         attackerTension += getSlaughterTension(attackerUnit);
                         defenderTension -= Tension.TENSION_ADD_NORMAL;
@@ -705,7 +708,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
      * @param equip The <code>EquipmentType</code> to capture.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csCaptureEquipment(Unit winner, Unit loser,
+    protected void csCaptureEquipment(Unit winner, Unit loser,
     		EquipmentType equip, ChangeSet cs) {
     	ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
     	ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
@@ -873,7 +876,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
      * @param loser The <code>Unit</code> to slaughter.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csSlaughterUnit(Unit winner, Unit loser, ChangeSet cs) {
+ /*   private void csSlaughterUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winner.getApparentOwnerName();
         StringTemplate winnerLocation = winner.getLocation()
@@ -922,7 +925,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
         // Destroy unit.
         cs.addDispose(See.perhaps().always(loserPlayer),
             loser.getLocation(), loser);
-    }
+    }*/
     
     
     /**
