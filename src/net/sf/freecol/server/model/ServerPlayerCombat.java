@@ -152,14 +152,17 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
         case WIN:
             vis = See.perhaps().always(defenderPlayer);
             if (isAttack) {//duplicate code rename validateAttack
-                if (attackerTile == null || defenderTile == null
+            	if(invalideAttack(attackerTile, defenderTile)){
+           /*   if (attackerTile == null || defenderTile == null
                     || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) 
-                		{
-                    logger.warning("Bogus attack from win " + attackerTile
+                		{*/
+            		logError(attackerTile, defenderTile );
+                   /* logger.warning("Bogus attack from win " + attackerTile
                         + " to " + defenderTile
-                        + "\n" + FreeColDebugger.stackTraceToString());
-                } else {
+                        + "\n" + FreeColDebugger.stackTraceToString());*/
+                }
+            	   else {
                 	//lets make an attack class
                     cs.addAttack(vis, attackerUnit, defenderUnit,
                                  attackerTile, defenderTile, true);
@@ -169,13 +172,22 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
         case LOSE:
             vis = See.perhaps().always(this);
             if (isAttack) {//duplicate code rename validateAttack
-                if (attackerTile == null || defenderTile == null
+            	if(invalideAttack(attackerTile, defenderTile)){
+            		
+            		logError(attackerTile, defenderTile );
+            		/* logger.warning("Bogus attack from " + attackerTile
+                             + " to " + defenderTile
+                             + "\n" + FreeColDebugger.stackTraceToString());	*/
+            	}
+            
+           /*  if (attackerTile == null || defenderTile == null
                     || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) {
                     logger.warning("Bogus attack from " + attackerTile
                         + " to " + defenderTile
                         + "\n" + FreeColDebugger.stackTraceToString());
-                } else {
+           */    
+            else {
                     cs.addAttack(vis, attackerUnit, defenderUnit,
                                  attackerTile, defenderTile, false);
                 }
@@ -433,18 +445,19 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
                     defenderTileDirty = true;
                 }
                 break;
-            case SLAUGHTER_UNIT://lets do some poly morphism
-                //slaughterUnit = new SlaughterUnit(attckerUnit, defenderUnit, cs); 
+            case SLAUGHTER_UNIT://lets do some polymorphism
+                //new class
             	slaughterUnit = new SlaughterUnit(getGame());
             	ok = isAttack && result != CombatResult.NO_RESULT;
                 if (ok) {
                     if (result == CombatResult.WIN) {
-                    	
+                    	//new class slaughterUnit
                         slaughterUnit.csSlaughterUnit(attackerUnit, defenderUnit, cs);
                         defenderTileDirty = true;
                         attackerTension -= Tension.TENSION_ADD_NORMAL;
                         defenderTension += getSlaughterTension(defenderUnit);
                     } else {
+                    	//new class slaughterUnit
                         slaughterUnit.csSlaughterUnit(defenderUnit, attackerUnit, cs);
                         attackerTileDirty = true;
                         attackerTension += getSlaughterTension(attackerUnit);
@@ -476,14 +489,39 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
        
         handleStanceAndTension(attacker, defenderPlayer); //refactored extract method
  
-        // next method moveAttacker(..)    
+      
         // Move the attacker if required.
         moveAttacker(attackerUnit, attacker, defenderPlayer, defenderTile, attackerTile, vis);
         // Move the attacker if required.
        
     }//end long method
     
-    /**
+    
+
+	private boolean invalideAttack(Tile attackerTile, Tile defenderTile) {
+		// TODO Auto-generated method stub
+    	
+    	 if (attackerTile == null || defenderTile == null
+                 || attackerTile == defenderTile
+                 || !attackerTile.isAdjacent(defenderTile)) {
+                 logger.warning("Bogus attack from " + attackerTile
+                     + " to " + defenderTile
+                     + "\n" + FreeColDebugger.stackTraceToString());
+                 return true;
+    	 } else {
+    		 
+    		 return false;
+    	 }
+	}
+	
+	private void logError(Tile attackerTile, Tile defenderTile) {
+		// TODO Auto-generated method stub
+    	logger.warning("Bogus attack from win " + attackerTile
+                + " to " + defenderTile
+                + "\n" + FreeColDebugger.stackTraceToString());
+		
+	}
+	/**
      * getSlaughterTension
      * Gets the amount to raise tension by when a unit is slaughtered.
      *
@@ -869,65 +907,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
         }
     }
 
-    /**
-     * Slaughter a unit.
-     *
-     * @param winner The <code>Unit</code> that is slaughtering.
-     * @param loser The <code>Unit</code> to slaughter.
-     * @param cs A <code>ChangeSet</code> to update.
-     */
- /*   private void csSlaughterUnit(Unit winner, Unit loser, ChangeSet cs) {
-        ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
-        StringTemplate winnerNation = winner.getApparentOwnerName();
-        StringTemplate winnerLocation = winner.getLocation()
-            .getLocationNameFor(winnerPlayer);
-        ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
-        StringTemplate loserNation = loser.getApparentOwnerName();
-        StringTemplate loserLocation = loser.getLocation()
-            .getLocationNameFor(loserPlayer);
-        String messageId = loser.getType().getId() + ".destroyed";
-
-        cs.addMessage(See.only(winnerPlayer),
-            new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                messageId, winner)
-            .setDefaultId("model.unit.unitSlaughtered")
-            .addStringTemplate("%nation%", loserNation)
-            .addStringTemplate("%unit%", loser.getLabel())
-            .addStringTemplate("%enemyNation%", winnerPlayer.getNationName())
-            .addStringTemplate("%enemyUnit%", winner.getLabel())
-            .addStringTemplate("%location%", winnerLocation));
-        cs.addMessage(See.only(loserPlayer),
-            new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                messageId, loser.getTile())
-            .setDefaultId("model.unit.unitSlaughtered")
-            .addStringTemplate("%nation%", loserPlayer.getNationName())
-            .addStringTemplate("%unit%", loser.getLabel())
-            .addStringTemplate("%enemyNation%", winnerNation)
-            .addStringTemplate("%enemyUnit%", winner.getLabel())
-            .addStringTemplate("%location%", loserLocation));
-        if (loserPlayer.isIndian() && loserPlayer.checkForDeath() == IS_DEAD) {
-            StringTemplate nativeNation = loserPlayer.getNationName();
-            cs.addGlobalHistory(getGame(),
-                new HistoryEvent(getGame().getTurn(),
-                    HistoryEvent.EventType.DESTROY_NATION)
-                .addStringTemplate("%nation%", winnerNation)
-                .addStringTemplate("%nativeNation%", nativeNation));
-        }
-
-        // Transfer equipment, do not generate messages for the loser.
-        EquipmentType equip;
-        while ((equip = loser.getBestCombatEquipmentType(loser.getEquipment()))
-               != null) {
-            loser.changeEquipment(equip, -loser.getEquipmentCount(equip));
-            csCaptureEquipment(winner, loser, equip, cs);
-        }
-
-        // Destroy unit.
-        cs.addDispose(See.perhaps().always(loserPlayer),
-            loser.getLocation(), loser);
-    }*/
-    
-    
+  
     /**
      * Capture a unit.
      *
