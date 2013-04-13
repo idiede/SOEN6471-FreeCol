@@ -69,7 +69,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
     boolean isAttack;
     boolean isBombard;
     
-    public ServerPlayerCombat(Game game){
+    public ServerPlayerCombat(Game game ){
     	super(game);
     	
     }
@@ -80,11 +80,11 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
                          Random random,
                          ChangeSet cs) throws IllegalStateException {
     
-    	this.attacker = attacker;
-        this.defender = defender;
-        this.crs = crs;
-        this.random = random;
-        this.cs = cs;
+          this.attacker = attacker;
+          this.defender = defender;
+          this.crs = crs;
+          this.random = random;
+          this.cs = cs;
     	//Local variables changed to Private Global
         CombatModel combatModel = getGame().getCombatModel();
         isAttack = combatModel.combatIsAttack(attacker, defender);
@@ -151,14 +151,16 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
             break; // Do not animate if there is no result.
         case WIN:
             vis = See.perhaps().always(defenderPlayer);
-            if (isAttack) {
+            if (isAttack) {//duplicate code rename validateAttack
                 if (attackerTile == null || defenderTile == null
                     || attackerTile == defenderTile
-                    || !attackerTile.isAdjacent(defenderTile)) {
-                    logger.warning("Bogus attack from " + attackerTile
+                    || !attackerTile.isAdjacent(defenderTile)) 
+                		{
+                    logger.warning("Bogus attack from win " + attackerTile
                         + " to " + defenderTile
                         + "\n" + FreeColDebugger.stackTraceToString());
                 } else {
+                	//lets make an attack class
                     cs.addAttack(vis, attackerUnit, defenderUnit,
                                  attackerTile, defenderTile, true);
                 }
@@ -166,7 +168,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
             break;
         case LOSE:
             vis = See.perhaps().always(this);
-            if (isAttack) {
+            if (isAttack) {//duplicate code rename validateAttack
                 if (attackerTile == null || defenderTile == null
                     || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) {
@@ -1572,7 +1574,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
     /////////////////////////////////////////new methods//////////////////////////////////////////////
     
     /*
-        // - added method    // Handle stance and tension. from orginal line 444
+        // - added method    // Handle stance and tension. from original line 444
         // - Privateers do not provoke stance changes but can set the
         // - attackedByPrivateers flag
         // - Attacks among Europeans imply war
@@ -1640,6 +1642,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
          }
     	
     }
+   
     void moveAttacker(Unit attackerUnit,FreeColGameObject attacker,
     		           ServerPlayer defenderPlayer, Tile defenderTile, Tile attackerTile, See vis){
     	  if (moveAttacker) {

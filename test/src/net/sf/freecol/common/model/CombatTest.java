@@ -488,7 +488,7 @@ public class CombatTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
 
         Unit colonial = new ServerUnit(game, tile1, french, colonialRegularType, muskets, horses);
-        Unit regular = new ServerUnit(game, tile1, french, kingsRegularType, muskets, horses);
+        Unit regular = new ServerUnit(game, tile2, french, kingsRegularType, muskets, horses);
 
         // (regular + muskets + horses) * attack bonus
         float offence = (4 + 2 + 1) * 1.5f;
@@ -513,7 +513,7 @@ public class CombatTest extends FreeColTestCase {
         assertEquals("King's Regular should be slaughtered upon losing all equipment.",
                      CombatResult.SLAUGHTER_UNIT, result.get(1));
 
-        regular = new ServerUnit(game, tile1, french, kingsRegularType, muskets, horses);
+        regular = new ServerUnit(game, tile2, french, kingsRegularType, muskets, horses);
 
         result = combatModel.generateAttackResult(random, regular, colonial);
         assertEquals(CombatResult.WIN, result.get(0));

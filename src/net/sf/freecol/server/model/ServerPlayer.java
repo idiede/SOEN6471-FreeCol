@@ -129,9 +129,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public ServerPlayer(Game game, String id) {
         super(game, id);
+        spCombat = new ServerPlayerCombat(this.getGame());//instance of ServerPlayerCombat
     }
     public ServerPlayer(Game game) {
-        super(game);
+       super(game);
     }
 
     /**
@@ -147,7 +148,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public ServerPlayer(Game game, String name, boolean admin, Nation nation,
                         Socket socket, Connection connection) {
         super(game);
-
+        this.spCombat = new ServerPlayerCombat(this.getGame());//instance of ServerPlayerCombat
         this.name = name;
         this.admin = admin;
         europe = null;
@@ -1903,8 +1904,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
     	 */
     	
     	
-          spCombat = new ServerPlayerCombat(this.getGame()); //instance of ServerPlayerCombat
-          spCombat.csCombat(attacker, defender, crs, random, cs); //delegate method csCombat to ServerPlayerCombat
+    	 // spCombat = new ServerPlayerCombat(this.getGame());//instance of ServerPlayerCombat
+        
+    	  spCombat.csCombat(attacker, defender, crs, random, cs); //delegate method csCombat to ServerPlayerCombat
+    	
+    	
     	////////////////////////////////// old method ////////////////////////////////////////////////
     	
 }//end class	
