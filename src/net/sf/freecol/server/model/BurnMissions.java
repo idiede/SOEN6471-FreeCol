@@ -17,6 +17,13 @@ public class BurnMissions extends ServerPlayerCombat{
 		super(game);
 	
 	}
+	 /**
+     * Burns a players missions.
+     *
+     * @param attacker The <code>Unit</code> that attacked.
+     * @param settlement The <code>IndianSettlement</code> that was attacked.
+     * @param cs The <code>ChangeSet</code> to update.
+     */
 	
 	  public void csBurnMissions(Unit attacker, IndianSettlement settlement,
 	    		ChangeSet cs) {

@@ -681,37 +681,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
         convert.setLocation(attacker.getTile());
     }
 
-    /**
-     * Burns a players missions.
-     *
-     * @param attacker The <code>Unit</code> that attacked.
-     * @param settlement The <code>IndianSettlement</code> that was attacked.
-     * @param cs The <code>ChangeSet</code> to update.
-     */
-
-  private void csBurnMissions(Unit attacker, IndianSettlement settlement,
-    		ChangeSet cs) {
-    	ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
-    	StringTemplate attackerNation = attackerPlayer.getNationName();
-    	ServerPlayer nativePlayer = (ServerPlayer) settlement.getOwner();
-    	StringTemplate nativeNation = nativePlayer.getNationName();
-
-    	// Message only for the European player
-    	cs.addMessage(See.only(attackerPlayer),
-    			new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-    					"model.unit.burnMissions", attacker, settlement)
-    	.addStringTemplate("%nation%", attackerNation)
-    	.addStringTemplate("%enemyNation%", nativeNation));
-
-    	// Burn down the missions
-    	for (IndianSettlement s : nativePlayer.getIndianSettlements()) {
-    		if (s.getMissionary(attackerPlayer) != null) {
-    			csKillMissionary(s, null, cs);
-    		}
-    	}
-}
-    
-    
+   
     /**
      * Captures equipment.
      *
