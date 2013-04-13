@@ -1904,12 +1904,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
     	 */
     	
     	
-    	 // spCombat = new ServerPlayerCombat(this.getGame());//instance of ServerPlayerCombat
+       	//Class ServerPlayerCombat called delegate method
         
     	  spCombat.csCombat(attacker, defender, crs, random, cs); //delegate method csCombat to ServerPlayerCombat
     	
     	
-    	////////////////////////////////// old method ////////////////////////////////////////////////
+    	////////////////////////////////// old method removed ////////////////////////////////////////////////
     	
 }//end class	
   

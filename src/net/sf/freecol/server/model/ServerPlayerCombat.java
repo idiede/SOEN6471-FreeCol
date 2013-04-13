@@ -69,6 +69,9 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
     boolean isAttack;
     boolean isBombard;
     SlaughterUnit slaughterUnit;
+    BurnMissions burnMission;
+    
+    
     public ServerPlayerCombat(Game game ){
     	super(game);
     	
@@ -153,16 +156,9 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
             vis = See.perhaps().always(defenderPlayer);
             if (isAttack) {//duplicate code rename validateAttack
             	if(invalideAttack(attackerTile, defenderTile)){
-           /*   if (attackerTile == null || defenderTile == null
-                    || attackerTile == defenderTile
-                    || !attackerTile.isAdjacent(defenderTile)) 
-                		{*/
-            		logError(attackerTile, defenderTile );
-                   /* logger.warning("Bogus attack from win " + attackerTile
-                        + " to " + defenderTile
-                        + "\n" + FreeColDebugger.stackTraceToString());*/
-                }
-            	   else {
+                    logError(attackerTile, defenderTile );
+              
+                } else {
                 	//lets make an attack class
                     cs.addAttack(vis, attackerUnit, defenderUnit,
                                  attackerTile, defenderTile, true);
@@ -173,27 +169,16 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
             vis = See.perhaps().always(this);
             if (isAttack) {//duplicate code rename validateAttack
             	if(invalideAttack(attackerTile, defenderTile)){
+            		 logError(attackerTile, defenderTile );
             		
-            		logError(attackerTile, defenderTile );
-            		/* logger.warning("Bogus attack from " + attackerTile
-                             + " to " + defenderTile
-                             + "\n" + FreeColDebugger.stackTraceToString());	*/
-            	}
-            
-           /*  if (attackerTile == null || defenderTile == null
-                    || attackerTile == defenderTile
-                    || !attackerTile.isAdjacent(defenderTile)) {
-                    logger.warning("Bogus attack from " + attackerTile
-                        + " to " + defenderTile
-                        + "\n" + FreeColDebugger.stackTraceToString());
-           */    
-            else {
+            	} else {
                     cs.addAttack(vis, attackerUnit, defenderUnit,
                                  attackerTile, defenderTile, false);
                 }
             }
             break;
         default:
+        	
             throw new IllegalStateException("generateAttackResult returned: "
                                             + result);
         }
@@ -224,7 +209,9 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
                     && isEuropean() && defenderPlayer.isIndian();
                 if (ok) {
                     defenderTileDirty |= natives.getMissionary(this) != null;
-                    csBurnMissions(attackerUnit, natives, cs);
+                    //more polymorphism
+                    burnMission = new BurnMissions(getGame());
+                    burnMission.csBurnMissions(attackerUnit, natives, cs);
                 }
                 break;
             case CAPTURE_AUTOEQUIP:
@@ -702,7 +689,7 @@ public class ServerPlayerCombat extends ServerPlayer implements ServerModelObjec
      * @param cs The <code>ChangeSet</code> to update.
      */
 
-    private void csBurnMissions(Unit attacker, IndianSettlement settlement,
+  private void csBurnMissions(Unit attacker, IndianSettlement settlement,
     		ChangeSet cs) {
     	ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
     	StringTemplate attackerNation = attackerPlayer.getNationName();
